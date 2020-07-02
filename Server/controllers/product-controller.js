@@ -6,11 +6,23 @@ const uuid = require("uuid");
 const productLogic = require('../business-logic/product-logic');
 const fs = require('fs');
 
-// get all products
+
+//(get) http://localhost:3000/api/products //? get all products
 router.get('/', async (request, response) => {
     try {
         const products = await productLogic.getAllProducts();
         response.json(products);
+    } catch (error) {
+        sendError(response, error);
+    }
+});
+//(get) http://localhost:3000/api/products/item/:id //? get one product
+router.get('/item/:id', async (request, response) => {
+    console.log("hi")
+    const id = +request.params.id
+    try {
+        const product = await productLogic.getOneProduct(id);
+        response.json(product);
     } catch (error) {
         sendError(response, error);
     }
@@ -53,15 +65,5 @@ router.post('/add-product', async (request, response) => {
 });
 
 
-router.get('/item/:id', async (request, response) => {
-    console.log("hi")
-    const id = +request.params.id
-    try {
-        const product = await productLogic.getOneProduct(id);
-        response.json(product);
-    } catch (error) {
-        sendError(response, error);
-    }
-});
 
 module.exports = router;
