@@ -10,10 +10,12 @@ const cryptography = require('../helpers/cryptography');
 // }
 
 async function addUser(user) {
+    console.log(user)
     user.password = cryptography.hash(user.password);
-    const sql = 'INSERT INTO users VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ? ,0, 0)'
+    const sql = 'INSERT INTO users VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ? ,null, 0)'
     await dal.executeAsync(sql, [user.firstName, user.lastName, user.username_email, user.password, user.city, user.street, user.id, user.isAdmin]);
     delete user.password;
+    console.log(user)
     return user;
 }
 // INSERT INTO `users` (`userID`, `firstName`, `lastName`, `username_email`, `password`, `city`, `street`, `id`, `isAdmin`, `firstVisit`) VALUES (NULL, '9', '9', '9', '9', '9', '9', '9', '0', NULL);

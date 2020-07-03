@@ -1,13 +1,26 @@
-.mat-drawer-content {
-  min-height: 75vh;
+.row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
-html, body {
-  height: 100%;
+.col {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.col-4 {
+  max-width: 25%;
+  min-width: 25%;
+}
+
+.text-center {
+  text-align: center;
 }
 /*# sourceMappingURL=styles.css.map */

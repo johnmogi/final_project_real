@@ -1,28 +1,35 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { AuthModel } from 'src/app/components/models/Auth-model';
+import { RegAuthModel } from 'src/app/models/Auth-model';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { ActionType } from 'src/app/redux/action-type';
+import { store } from 'src/app/redux/store';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styles: [
-  ]
+  styleUrls: ['./register.css'],
 })
 export class RegisterComponent implements OnInit {
-  isLinear = true;
-  firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;
+  public user = new RegAuthModel();
+  public regUser = {
+    id: '',
+    username_email: '',
+    password: '',
+    conf_password: '',
+  };
 
-  public user = new AuthModel();
-public validated1 = false;
+  public sendForm = this.user;
+  public firstStepValid = false;
+  public secondStepValid = false;
+
+  public errorbox = '';
   public errorMessages = {
     id: 'make sure to fill ID',
-    idTaken: '',
     email: 'make sure to fill Email',
-    emailTaken : '',
     passwords: 'make sure to fill password',
-  }; 
+    passwordsMatch: 'passwords do not match, try again...',
+  };
   public cities = [
     'Metula',
     'Haifa',
@@ -37,40 +44,75 @@ public validated1 = false;
     'Eilat',
   ];
 
+  constructor(private authService: AuthService, private router: Router) {}
 
+  ngOnInit() {}
 
-  constructor(private _formBuilder: FormBuilder, private authService:AuthService) {}
+  public checkValid() {
+    console.log(this.user);
 
-  ngOnInit() {
-    this.firstFormGroup = this._formBuilder.group({
-      firstCtrl: ['', Validators.required]
-    });
-    this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ['', Validators.required]
-    });
-  }
-  public checkUser(){
-    console.table("chckusr:", this.user)
-    if(this.user.username_email){
+    // if (this.user.password != this.user.conf_password) {
+    //   this.errorbox = this.errorMessages.passwordsMatch;
 
-      this.validated1 = true;
+    //   return;
+    // }
+    if (
+      !this.user.id ||
+      !this.user.username_email ||
+      !this.user.password ||
+      !this.user.conf_password
+    ) {
+      this.errorbox = 'make sure you fill all fields';
+
+      return;
+    } else {
     }
+    // this.errorbox = '';
+    this.firstStepValid = true;
+    return;
+  }
+
+  public checkUser() {
+    this.checkValid();
 
     this.authService.checkUser(this.user).subscribe((res) => {
+      this.errorbox = res.message;
       console.log(res);
       if (res.message.email) {
-        this.errorMessages.emailTaken = res.message;
+        this.errorbox = res.message;
       }
-      // if (res.message.id) {
-      //   this.errorbox = res.message;
-      // }
+      if (res.message.id) {
+        this.errorbox = res.message;
+      }
+
       if (res.user) {
-        this.validated1 = true;
+        this.firstStepValid = true;
 
         return;
       }
     });
-    
-    console.log(this.user)
+    return;
+  }
+
+  public addUser() {
+    this.authService.addUser(this.sendForm).subscribe(
+      (response) => {
+        alert('you have completed the registration, Wellcome: ' + JSON.stringify(response));
+        //live User
+        this.authService.liveUser().subscribe(
+          (res) => {
+            console.table("looking for a pulse: " + JSON.stringify(res))
+console.table("looking for a pulse: " + JSON.stringify(res.user))
+
+
+            const action = { type: ActionType.userLogin, payload: res.user };
+            store.dispatch(action);
+          },
+          (err) => alert(err.message)
+        );
+        this.router.navigateByUrl('/');
+      },
+      (err) => alert(err.message)
+    );
   }
 }
