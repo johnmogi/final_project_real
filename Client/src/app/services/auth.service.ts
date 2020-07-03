@@ -31,6 +31,11 @@ export class AuthService {
       headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
     });
   }
+  // need to attach jwt unless user will get disconnected on 1st refresh...
+public quickUser() : Observable < any > {
+    return this.http.get<any>(this.api + 'user-wellcome');
+}
+
   public visitUp(userID): Observable<any> {
     return this.http.patch<any>(this.api + `up-visit/${userID}`, '');
   }

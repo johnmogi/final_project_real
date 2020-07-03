@@ -32,7 +32,7 @@ async function verifyDuplicate(product) {
 // INSERT INTO `cartItem` (productID, amount, totalPrice, cartID) VALUES (NULL, '23', '1', '250', '4');
 
 async function AddItemToCart(cartID, productID, amount) {
-    // console.log(+cartID, +productID)
+    console.log(+cartID, +productID)
 
     const findPrice = `SELECT price FROM products WHERE productID = ${productID}`;
     const resPrice = await dal.executeAsync(findPrice);

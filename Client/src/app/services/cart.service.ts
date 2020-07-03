@@ -32,7 +32,7 @@ export class CartService {
   }
   // add item to cart
   public addItemToCart(sendInfo, cartID): Observable<CartItemModel[]> {
-    // console.table('service', sendInfo);
+   console.table('service', sendInfo);
     return this.http.post<CartItemModel[]>(
       `http://localhost:${port}/api/cart/add-item/${cartID}`,
       sendInfo

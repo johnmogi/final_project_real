@@ -16,13 +16,15 @@ export class LayoutComponent implements OnInit { // import everything to homepag
     public cartHolder : CartModel[] = [];
     public orders : OrderModel[] = [];
 
+    public cartLoop : Boolean = false;
+
     public userCart = [];
     public userCartItems = [];
     public cartTime : String;
     public cartPrice : Number;
 
     public user = new AuthModel();
-    public isAdmin  = false;
+    public isAdmin = false;
     public firstName : String;
     public firstVisit : String;
     public visitCounter : Boolean = false;
@@ -91,12 +93,15 @@ export class LayoutComponent implements OnInit { // import everything to homepag
     } // ngoninit
 
     public logout(): void {
+localStorage.removeItem('token');
+localStorage.removeItem('userItems');
+localStorage.removeItem('userCart');
+
         const action = {
             type: ActionType.userLogout,
             payload: null
         };
         store.dispatch(action);
-        localStorage.removeItem('token');
         this.userCart = [];
         this.router.navigateByUrl('/');
     }
@@ -104,19 +109,21 @@ export class LayoutComponent implements OnInit { // import everything to homepag
     public async fetchCart(id : Number) {
         this.cartService.findCart(id).subscribe((res) => {
             this.userCart[0] = res[0];
+            // console.table('cart #:' + JSON.stringify(res[0].cartID));
             this.cartTime = this.userCart[0].cartTime;
-
             this.fetchCartItems(res[0].cartID);
-            // console.table('user:' + JSON.stringify(res[0].cartID));
-        }, (err) => this.makeCart(id) // ! look in login for correct failure responses... logically- because of order option to delete cart ):
-        );
+            localStorage.removeItem('userCart');
+            localStorage.setItem('userCart', JSON.stringify(this.userCart[0]));
+        }, (err) => alert(err.message));
     }
+
     public async fetchCartItems(id : Number) {
         console.table('cart:' + id);
         this.cartService.fetchItems(id).subscribe((res) => {
-            if (res.length > 0) {
-                console.table('cart has items:' + JSON.stringify(res.length));
-                this.userCartItems[0] = res[0];
+            if (res.length > 0) { // console.table('cart has items:' + JSON.stringify(res.length));
+                this.userCartItems = res;
+                localStorage.removeItem('userItems');
+                localStorage.setItem('userItems', JSON.stringify(this.userCartItems));
                 this.cartPrice = this.userCartItems[0].totalPrice;
             }
         }, (err) => err.message);
@@ -125,7 +132,7 @@ export class LayoutComponent implements OnInit { // import everything to homepag
         console.table('user for new cart : ' + id);
         this.cartService.makeCart(id).subscribe((res) => {
             this.userCart[0] = res[0];
-            console.table('new cart :' + JSON.stringify(res[0]));
+            // console.table('new cart :' + JSON.stringify(res[0]));
         }, (err) => err.message);
     }
 } // LayoutComponent
